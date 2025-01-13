@@ -1,0 +1,401 @@
+#include <iostream>
+#include <fstream>
+#include <unistd.h>
+#include <cstdlib>
+
+using namespace std;
+
+const int rows = 30, cols = 30;
+int life[30][30], temp[30][30];
+int population = 0;
+char filename[20];
+
+int main()
+{
+    cout << "Enter File Name: ";
+    cin >> filename;
+
+    ifstream infile(filename);
+
+    // check if file is open
+    if (infile.is_open())
+    {
+        // input every charcter in life array
+        for (int i = 0; i < rows; i++)
+        {
+            for (int j = 0; j < cols; j++)
+            {
+                infile >> life[i][j];
+                if (infile.fail())
+                {
+                    cout << "error occured while reading the file." << endl;
+                    return 0;
+                }
+            }
+        }
+    }
+    else
+    {
+        cout << "file not found." << endl;
+        return 0;
+    }
+
+    infile.close();
+
+    cout << "Enter the number of Generations: ";
+    int nGen;
+    cin >> nGen;
+    int index = 0;
+
+    // print intiial stage
+    cout << "Initial stage: " << endl;
+    for (int x = 0; x < rows; x++)
+    {
+        for (int y = 0; y < cols; y++)
+        {
+            if (life[x][y] == 1)
+            {
+                cout << "O ";
+            }
+            else
+            {
+                cout << ". ";
+            }
+        }
+        cout << endl;
+    }
+
+    cout << endl;
+
+    // loop for generations
+    while (index < nGen)
+    {
+        usleep(500000);
+        system("cls");
+
+        cout << "Generation: " << index + 1;
+
+        //initialise population
+        population = 0;
+
+        // for loop or rows of array
+        for (int x = 0; x < rows; x++)
+        {
+            // for loop for columns of array
+            for (int y = 0; y < cols; y++)
+            {
+
+                int cells = 0;
+
+                // first row has no life above it
+                if (x == 0)
+                {
+                    // first column has no life left of it or above it
+                    if (y == 0)
+                    {
+                        if (life[x][y + 1])
+                        {
+                            cells++;
+                        }
+                        if (life[x + 1][y + 1])
+                        {
+                            cells++;
+                        }
+                        if (life[x + 1][y])
+                        {
+                            cells++;
+                        }
+                    }
+
+                    // all other columns have no life above them
+                    else if (y < cols - 1)
+                    {
+                        if (life[x][y - 1])
+                        {
+                            cells++;
+                        }
+                        if (life[x + 1][y - 1])
+                        {
+                            cells++;
+                        }
+                        if (life[x + 1][y])
+                        {
+                            cells++;
+                        }
+                        if (life[x + 1][y + 1])
+                        {
+                            cells++;
+                        }
+                        if (life[x][y + 1])
+                        {
+                            cells++;
+                        }
+                    }
+                    // last column has no life right of it or above it
+                    else
+                    {
+                        if (life[x][y - 1])
+                        {
+                            cells++;
+                        }
+                        if (life[x + 1][y - 1])
+                        {
+                            cells++;
+                        }
+                        if (life[x + 1][y])
+                        {
+                            cells++;
+                        }
+                    }
+                }
+                // center elements of center rows have life all around them
+                else if (x < (rows - 1))
+                {
+                    // first column has no life left of it
+                    if (y == 0)
+                    {
+                        if (life[x - 1][y])
+                        {
+                            cells++;
+                        }
+                        if (life[x - 1][y + 1])
+                        {
+                            cells++;
+                        }
+                        if (life[x][y + 1])
+                        {
+                            cells++;
+                        }
+                        if (life[x + 1][y + 1])
+                        {
+                            cells++;
+                        }
+                        if (life[x + 1][y])
+                        {
+                            cells++;
+                        }
+                    }
+                    // center columns have life everywhere
+                    else if (y < (cols - 1))
+                    {
+                        {
+                            if (life[x + 1][y])
+                            {
+                                cells++;
+                            }
+                            if (life[x + 1][y + 1])
+                            {
+                                cells++;
+                            }
+                            if (life[x][y + 1])
+                            {
+                                cells++;
+                            }
+                            if (life[x - 1][y + 1])
+                            {
+                                cells++;
+                            }
+                            if (life[x - 1][y])
+                            {
+                                cells++;
+                            }
+                            if (life[x - 1][y - 1])
+                            {
+                                cells++;
+                            }
+                            if (life[x][y - 1])
+                            {
+                                cells++;
+                            }
+                            if (life[x + 1][y - 1])
+                            {
+                                cells++;
+                            }
+                        }
+                    }
+                    // last colums has no life right of it
+                    else
+                    {
+                        if (life[x - 1][y])
+                        {
+                            cells++;
+                        }
+                        if (life[x - 1][y - 1])
+                        {
+                            cells++;
+                        }
+                        if (life[x][y - 1])
+                        {
+                            cells++;
+                        }
+                        if (life[x + 1][y - 1])
+                        {
+                            cells++;
+                        }
+                        if (life[x + 1][y])
+                        {
+                            cells++;
+                        }
+                    }
+                }
+                // last row has no life below it
+                else
+                {
+                    // first column has no life left of it
+                    if (y == 0)
+                    {
+                        if (life[x - 1][y])
+                        {
+                            cells++;
+                        }
+                        if (life[x - 1][y + 1])
+                        {
+                            cells++;
+                        }
+                        if (life[x][y + 1])
+                        {
+                            cells++;
+                        }
+                    }
+                    // center columns have no life below them only
+                    else if (y < (cols - 1))
+                    {
+                        if (life[x][y - 1])
+                        {
+                            cells++;
+                        }
+                        if (life[x - 1][y - 1])
+                        {
+                            cells++;
+                        }
+                        if (life[x - 1][y])
+                        {
+                            cells++;
+                        }
+                        if (life[x - 1][y + 1])
+                        {
+                            cells++;
+                        }
+                        if (life[x][y + 1])
+                        {
+                            cells++;
+                        }
+                    }
+                    // last column has no life right of it and below it
+                    else
+                    {
+                        if (life[x - 1][y])
+                        {
+                            cells++;
+                        }
+                        if (life[x - 1][y - 1])
+                        {
+                            cells++;
+                        }
+                        if (life[x][y - 1])
+                        {
+                            cells++;
+                        }
+                    }
+                }
+
+                // where we give life and death
+                // check if cell alive
+                if (life[x][y] == 1)
+                {
+
+                    population++;
+
+                    if (cells == 2 || cells == 3)
+                    {
+                        // Cell Dies due to underpopulation or overpopulation
+                        temp[x][y] = 1;
+                    }
+                    else
+                    {
+                        // Cell Survives
+                        temp[x][y] = 0;
+                    }
+                }
+                else
+                {
+                    if (cells == 3)
+                    {
+                        // Cell is resurrected
+                        temp[x][y] = 1;
+                    }
+                    else
+                    {
+                        // Cell remains in its grave
+                        temp[x][y] = 0;
+                    }
+                }
+            }
+        }
+
+        cout << endl << "current Population: " << population << endl;
+        population = 0;
+
+        // print each generation
+        int y = 0, x = 0;
+        for (int y = 0; y < rows; y++)
+        {
+            for (int x = 0; x < cols; x++)
+            {
+
+                if (temp[y][x] == 0)
+                {
+                    cout << ". ";
+                }
+                else
+                {
+                    cout << "O ";
+                }
+            }
+            cout << endl;
+        }
+
+        // renew life array
+        for (int y = 0; y < rows; y++)
+        {
+            for (int x = 0; x < cols; x++)
+            {
+                life[y][x] = temp[y][x];
+                temp[y][x] = 0;
+            }
+        }
+
+        
+
+        index++;
+    }
+
+    // save file with final generation
+    ofstream outfile(filename);
+
+    if (outfile.is_open())
+    {
+        for (int i = 0; i < rows; i++)
+        {
+            for (int j = 0; j < cols; j++)
+            {
+                outfile << life[i][j];
+                if (j < cols - 1)
+                {
+                    outfile << " ";
+                }
+            }
+            outfile << endl;
+        }
+        outfile.close();
+    }
+    else
+    {
+        cout << "file not found." << endl;
+        return 0;
+    }
+
+    cin.ignore(1000, '\n');
+    
+    return 0;
+}
